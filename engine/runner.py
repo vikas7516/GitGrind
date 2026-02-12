@@ -47,7 +47,7 @@ def run_exercise(exercise, state, index=None, total=None, allow_hint=True, recor
             else:
                 if record_stats:
                     state.record_wrong()
-                ui.show_wrong(step.answers[0], step.explanation if hasattr(step, 'explanation') else None)
+                ui.show_wrong(step.answers[0], step.explanation)
                 return False
         return True
 

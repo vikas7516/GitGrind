@@ -36,12 +36,12 @@ if _duplicates:
 # Validate all stages can be resolved
 _missing_stages = []
 for i, stage in enumerate(STAGE_MAP):
-    if stage.stage_type == STAGE_LEVEL and stage.level_number not in ALL_LEVELS:
-        _missing_stages.append(f"Stage {i}: Level {stage.level_number} not found")
-    elif stage.stage_type == STAGE_EXERCISE and stage.round_number not in ALL_EXERCISE_ROUNDS:
-        _missing_stages.append(f"Stage {i}: Exercise round {stage.round_number} not found")
-    elif stage.stage_type == STAGE_BOSS and stage.fight_number not in ALL_BOSS_FIGHTS:
-        _missing_stages.append(f"Stage {i}: Boss fight {stage.fight_number} not found")
+    if stage.stage_type == STAGE_LEVEL and stage.data_key not in ALL_LEVELS:
+        _missing_stages.append(f"Stage {i}: Level {stage.data_key} not found")
+    elif stage.stage_type == STAGE_EXERCISE and stage.data_key not in ALL_EXERCISE_ROUNDS:
+        _missing_stages.append(f"Stage {i}: Exercise round {stage.data_key} not found")
+    elif stage.stage_type == STAGE_BOSS and stage.data_key not in ALL_BOSS_FIGHTS:
+        _missing_stages.append(f"Stage {i}: Boss fight {stage.data_key} not found")
 if _missing_stages:
     raise ValueError(f"Stage map references missing content:\n" + "\n".join(_missing_stages))
 

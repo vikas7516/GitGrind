@@ -44,10 +44,10 @@ htmlcov/
 .tox/
 .nox/
 
-# Game data (optional - uncomment to exclude save files)
-# save_data.json
-# save_data.json.bak
-# git_cheatsheet.txt
+# Game data (exclude save files)
+save_data.json
+save_data.json.bak
+git_cheatsheet.txt
 
 # Distribution / packaging
 *.egg-info/
