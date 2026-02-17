@@ -487,10 +487,75 @@ BOSS_FIGHT_5 = BossFight(
 )
 
 
+# ═══════════════════════════════════════════════════════════
+#  BOSS FIGHT 6 — COMMAND ARENA (ultimate final)
+# ═══════════════════════════════════════════════════════════
+
+BOSS_FIGHT_6 = BossFight(
+    number=6,
+    name="COMMAND ARENA — GRAND FINAL",
+    tagline="Three phases. Mixed command recall under pressure.",
+    story=(
+        "This is the final certification gauntlet.\n"
+        "Phase 1 checks daily fundamentals, Phase 2 checks collaboration workflows,\n"
+        "Phase 3 checks recovery/debugging and release operations.\n"
+        "Every step must be correct."
+    ),
+    steps=[
+        Exercise(type="recall", prompt="Phase 1/3 — Foundations: Check repository state.",
+                 answers=["git status"], explanation="Always orient yourself first with status."),
+        Exercise(type="recall", prompt="Phase 1/3 — Stage all current changes.",
+                 answers=["git add .", "git add -A"], explanation="Stage all intended edits before commit."),
+        Exercise(type="recall", prompt="Phase 1/3 — Commit with message 'feat: prep release'.",
+                 answers=['git commit -m "feat: prep release"', "git commit -m 'feat: prep release'"],
+                 explanation="Commit snapshots should have clear intent."),
+        Exercise(type="recall", prompt="Phase 1/3 — Show compact history.",
+                 answers=["git log --oneline"], explanation="Fast history scan."),
+        Exercise(type="recall", prompt="Phase 1/3 — Create and switch to branch feature/finalize.",
+                 answers=["git switch -c feature/finalize", "git checkout -b feature/finalize"],
+                 explanation="Standard feature branch start."),
+
+        Exercise(type="recall", prompt="Phase 2/3 — Verify remotes with URLs.",
+                 answers=["git remote -v"], explanation="Confirm remote wiring before push/pull."),
+        Exercise(type="recall", prompt="Phase 2/3 — Fetch and prune stale remote refs.",
+                 answers=["git fetch --prune"], explanation="Sync + cleanup remote-tracking refs."),
+        Exercise(type="recall", prompt="Phase 2/3 — Rebase onto latest origin/main.",
+                 answers=["git rebase origin/main"], explanation="Replay local commits on top of latest remote base."),
+        Exercise(type="recall", prompt="Phase 2/3 — Rebase conflict resolved and staged. Continue.",
+                 answers=["git rebase --continue"], explanation="Continue rebase after conflict fixes."),
+        Exercise(type="recall", prompt="Phase 2/3 — Push feature/finalize and set upstream.",
+                 answers=["git push -u origin feature/finalize", "git push origin feature/finalize"],
+                 explanation="Publish branch for review."),
+        Exercise(type="scenario", prompt="Phase 2/3 — Next team step after push?",
+                 answers=["open pull request", "open a pull request", "create pull request", "create a pull request"],
+                 explanation="Team workflow goes through PR review."),
+
+        Exercise(type="recall", prompt="Phase 3/3 — Start bisect and mark current as bad.",
+                 answers=["git bisect start && git bisect bad"], explanation="Start binary search for regression."),
+        Exercise(type="recall", prompt="Phase 3/3 — Mark known good commit a1b2c3d.",
+                 answers=["git bisect good a1b2c3d"], explanation="Bisect needs one good and one bad boundary."),
+        Exercise(type="recall", prompt="Phase 3/3 — Exit bisect mode.",
+                 answers=["git bisect reset"], explanation="Return repository to normal state."),
+        Exercise(type="recall", prompt="Phase 3/3 — Squash merge feature/finalize into current branch.",
+                 answers=["git merge --squash feature/finalize"], explanation="Integrate many commits as one clean commit."),
+        Exercise(type="recall", prompt="Phase 3/3 — Tag release v3.0 with message 'Grand final release'.",
+                 answers=['git tag -a v3.0 -m "Grand final release"', "git tag -a v3.0 -m 'Grand final release'"],
+                 explanation="Annotated tags mark official releases."),
+        Exercise(type="recall", prompt="Phase 3/3 — Push the v3.0 tag to origin.",
+                 answers=["git push origin v3.0", "git push --tags"], explanation="Tags are pushed explicitly."),
+        Exercise(type="recall", prompt="Phase 3/3 — Final verification command for branch graph.",
+                 answers=["git log --oneline --graph", "git log --oneline --graph --all"],
+                 explanation="Visual confirmation of final history state.",
+                 sim_output="🏆 Certification complete. You cleared the full Git command arena."),
+    ],
+)
+
+
 ALL_BOSS_FIGHTS = {
     1: BOSS_FIGHT_1,
     2: BOSS_FIGHT_2,
     3: BOSS_FIGHT_3,
     4: BOSS_FIGHT_4,
     5: BOSS_FIGHT_5,
+    6: BOSS_FIGHT_6,
 }

@@ -33,7 +33,7 @@ python main.py
 ### Progress
 - Your progress is **auto-saved** after each stage
 - You can **replay** levels from the main menu
-- Complete all stages to unlock the **cheat sheet** reward
+- Complete all stages to unlock the **cheat sheet + mastery report** rewards
 
 ## Troubleshooting
 
@@ -61,43 +61,53 @@ Basics (Levels 1-6)
     ↓
 Exercise Round 1
     ↓
-Branching (Levels 7-10)
+Exercise Round 2 (Retention)
     ↓
-Exercise Round 2
+Branching (Levels 7-10)
     ↓
 Boss Fight 1
     ↓
-Remotes (Levels 11-14)
-    ↓
 Exercise Round 3
+    ↓
+Exercise Round 6 (Retention Sprint I)
+    ↓
+Remotes (Levels 11-14)
     ↓
 Boss Fight 2
     ↓
-Advanced (Levels 15-20)
-    ↓
 Exercise Round 4
     ↓
-Boss Fight 3-5
+Advanced (Levels 15-21)
     ↓
 Exercise Round 5
     ↓
-🏆 Cheat Sheet Unlocked!
+Boss Fight 3
+    ↓
+Boss Fight 4
+    ↓
+Exercise Round 7 (Retention Marathon)
+    ↓
+Boss Fight 5
+    ↓
+Boss Fight 6 (COMMAND ARENA — GRAND FINAL)
+    ↓
+🏆 Cheat Sheet + Mastery Report Unlocked!
 ```
 
 ## What to Expect
 
-### Levels (20 total)
+### Levels (21 total)
 - Teaching slides with examples
 - 4-6 exercises per level
 - Drill zone (rapid-fire practice)
 - **Takes**: 10-15 minutes per level
 
-### Exercise Rounds (5 total)
+### Exercise Rounds (7 total)
 - Mixed review of previous content
 - 15 exercises, need 12 correct
 - **Takes**: 5-10 minutes per round
 
-### Boss Fights (5 total)
+### Boss Fights (6 total)
 - Multi-step real-world scenarios
 - Every step must be correct
 - **Takes**: 10-20 minutes per fight
@@ -110,8 +120,8 @@ Exercise Round 5
 ## After Completion
 
 ✅ You'll understand Git fundamentally, not just memorized commands  
-✅ You'll have practiced 433 exercises with real feedback  
-✅ You'll receive a personalized cheat sheet of all commands learned  
+✅ You'll have practiced 400+ exercises with real feedback  
+✅ You'll receive a personalized cheat sheet and mastery report  
 ✅ You'll be ready for real-world Git workflows  
 
 ---

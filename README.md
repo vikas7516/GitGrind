@@ -21,11 +21,11 @@
 Most Git tutorials teach you to **memorize commands**. GitGrind teaches you to **understand Git**.
 
 - ✅ **Instant Feedback** - Learn from mistakes with clear explanations
-- ✅ **Progressive Learning** - 20 levels from beginner to advanced
+- ✅ **Progressive Learning** - 21 levels from beginner to advanced
 - ✅ **Real Scenarios** - Boss fights simulate actual workflows
 - ✅ **No Setup Required** - Practice without creating repositories
 - ✅ **Track Progress** - Save your journey and earn rewards
-- ✅ **100% Educational** - 433 exercises with detailed explanations
+- ✅ **100% Educational** - 400+ exercises with detailed explanations
 
 ## 📸 Screenshots
 
@@ -40,10 +40,10 @@ Most Git tutorials teach you to **memorize commands**. GitGrind teaches you to *
 ## ✨ Features
 
 ### 🎓 **Comprehensive Learning Path**
-- **20 Progressive Levels** - From `git init` to `git rebase --interactive`
-- **5 Exercise Rounds** - Grinding sessions to build muscle memory  
-- **5 Boss Fights** - Complex multi-step workflows
-- **433 Total Exercises** - Each with contextual explanations
+- **21 Progressive Levels** - From `git init` to advanced maintenance workflows
+- **7 Exercise Rounds** - Grinding + spaced-repetition sessions  
+- **6 Boss Fights** - Complex multi-step workflows (including final gauntlet)
+- **400+ Total Exercises** - Each with contextual explanations
 
 ### 💡 **Smart Teaching System**
 - **Teaching Slides** - Detailed explanations with examples before practice
@@ -57,7 +57,7 @@ Most Git tutorials teach you to **memorize commands**. GitGrind teaches you to *
 - **Streak Tracking** - Build momentum with consecutive correct answers
 - **Accuracy Stats** - Track improvement over time
 - **Auto-Save** - Never lose progress
-- **Cheat Sheet Reward** - Unlock a personalized command reference
+- **Final Rewards** - Unlock a personalized cheat sheet + mastery report
 
 ### 🎨 **Beautiful Terminal UI**
 - Powered by [Rich](https://github.com/Textualize/rich)
@@ -124,10 +124,10 @@ Each level follows a proven learning pattern:
 4. **🔥 Drill Zone** - Rapid-fire practice (8/10 to pass)
 
 ### Progression System
-- Clear **31 total stages** (20 levels + 5 rounds + 5 boss fights + setup)
+- Clear **35 total stages** (21 levels + 7 rounds + 6 boss fights + setup)
 - Earn **XP** for correct answers
 - Build **streaks** for consecutive successes
-- Unlock **cheat sheet** upon completion
+- Unlock **cheat sheet + mastery report** upon completion
 
 ## 📚 What You'll Learn
 
@@ -147,7 +147,7 @@ Each level follows a proven learning pattern:
 - Cloning, pushing, and pulling
 - Fetch vs pull workflows
 
-### 🔴 Advanced (Levels 15-20)
+### 🔴 Advanced (Levels 15-21)
 - Restoring and resetting changes
 - Safe undo with revert
 - Stashing work in progress
@@ -157,6 +157,9 @@ Each level follows a proven learning pattern:
 - Tagging releases
 - Force-push safely
 - Git blame and aliases
+- Maintenance commands (show/clean/mv/grep)
+- Branch comparison and squash merge
+- Bisect workflow for regression hunting
 
 ### 💪 Boss Fights
 1. **The Broken Repo** - Fix .gitignore mistakes
@@ -164,17 +167,18 @@ Each level follows a proven learning pattern:
 3. **The Sync Disaster** - Resolve push/pull conflicts
 4. **Detached HEAD Nightmare** - Recover lost commits
 5. **THE FINAL BOSS** - Complete professional workflow from clone to release
+6. **COMMAND ARENA (GRAND FINAL)** - Multi-phase all-commands gauntlet
 
 ## 📊 Content Overview
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| **Levels** | 20 | Progressive learning modules |
-| **Exercise Rounds** | 5 | Focused practice sessions |
-| **Boss Fights** | 5 | Multi-step challenges |
-| **Total Exercises** | 433 | Each with explanations |
-| **Commands Taught** | 60+ | From basics to advanced |
-| **Teaching Slides** | 50+ | Detailed explanations |
+| **Levels** | 21 | Progressive learning modules |
+| **Exercise Rounds** | 7 | Focused + spaced-repetition sessions |
+| **Boss Fights** | 6 | Multi-step challenges |
+| **Total Exercises** | 400+ | Each with explanations |
+| **Commands Taught** | 70+ | From basics to advanced |
+| **Teaching Slides** | 60+ | Detailed explanations |
 
 ## 🛠️ Project Structure
 
@@ -199,8 +203,8 @@ gitgrind/
     ├── levels_basics.py       # Levels 1-6
     ├── levels_branch.py       # Levels 7-10
     ├── levels_remote.py       # Levels 11-14
-    ├── levels_adv.py          # Levels 15-20
-    ├── exercises.py           # Exercise rounds 1-5
+    ├── levels_adv.py          # Levels 15-21
+    ├── exercises.py           # Exercise rounds 1-7
     └── bossfights.py          # Boss fights 1-5
 ```
 

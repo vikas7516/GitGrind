@@ -489,11 +489,13 @@ LEVEL_10 = Level(
             ],
             sim_output="$ git add app.py\n$ git commit\n[main m3rg3id] Merge branch 'feature'",
             hint="Stage the resolved file, then commit",
+            explanation="Conflict flow is always: resolve file content, stage resolved files with 'git add', then run 'git commit' to finish the merge.",
         ),
         Exercise(
             type="multi_choice",
             prompt="In a conflict file, what does the ======= line separate?",
             answers=["c"],
+            explanation="The top block (above =======) is your current branch (HEAD), and the bottom block is incoming changes from the branch being merged.",
             choices=["a) Two different files", "b) Old code and new code", "c) Your changes (above) and incoming changes (below)"],
         ),
         Exercise(
@@ -502,12 +504,14 @@ LEVEL_10 = Level(
             answers=["git add <file> && git commit", "git add . && git commit",
                      "git add app.py && git commit"],
             hint="Stage the resolved file, then commit to finalize the merge",
+            explanation="Once markers are removed and final code is chosen, stage the resolved file(s) and commit to complete merge resolution.",
             sim_output="$ git add app.py\n$ git commit\n[main m3rg3id] Merge branch 'feature'",
         ),
         Exercise(
             type="recall",
             prompt="After resolving a conflict and staging the file, what command completes the merge?",
             answers=["git commit"],
+            explanation="After staging resolved files, a plain 'git commit' creates the merge commit and exits conflict state.",
             sim_output="$ git commit\n[main m3rg3id] Merge branch 'feature'",
         ),
     ],

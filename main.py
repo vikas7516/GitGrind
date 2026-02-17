@@ -5,7 +5,7 @@ import sys
 import ui
 from engine.state import GameState
 from engine.runner import (
-    run_level, run_exercise_round, run_boss_fight, run_setup, QUIT_SENTINEL,
+    run_level, run_exercise_round, run_boss_fight, QUIT_SENTINEL,
 )
 from content.models import STAGE_SETUP, STAGE_LEVEL, STAGE_EXERCISE, STAGE_BOSS
 from content.stage_map import STAGE_MAP
@@ -16,6 +16,7 @@ from content.levels_adv import ADVANCED_LEVELS
 from content.exercises import ALL_EXERCISE_ROUNDS
 from content.bossfights import ALL_BOSS_FIGHTS
 from cheatsheet import generate_cheatsheet
+from notebook import generate_notebook_txt
 
 
 ALL_LEVELS = {}
@@ -69,8 +70,8 @@ def run_stage(stage_index, state):
     stage = STAGE_MAP[stage_index]
 
     if stage.stage_type == STAGE_SETUP:
-        from content.levels_basics import SETUP_EXERCISES
-        return run_setup(SETUP_EXERCISES, state)
+        from content.levels_basics import SETUP_LEVEL
+        return run_level(SETUP_LEVEL, state)
 
     elif stage.stage_type == STAGE_LEVEL:
         level = ALL_LEVELS.get(stage.data_key)
@@ -112,7 +113,7 @@ def handle_boss_retry(stage_idx, stage, state):
             retry = retry.lower().strip()
             if retry in ("s", "skip"):
                 state.clear_stage(stage_idx)
-                ui.console.print("  [yellow]Boss skipped. Moving on.[/yellow]")
+                ui.console.print("  [bold bright_yellow]⏭️  Boss skipped. Moving on...[/bold bright_yellow]")
                 ui.pause()
                 return True
             elif retry in ("q", "quit", "n", "no"):
@@ -148,18 +149,21 @@ def handle_boss_retry(stage_idx, stage, state):
 
 def play_continue(state):
     """Continue from the current stage index."""
+    state.start_session()
+
     while state.current_stage_index < TOTAL_STAGES:
         idx = state.current_stage_index
         stage = STAGE_MAP[idx]
 
         ui.show_level_map(STAGE_MAP, state.cleared_stages)
-        ui.console.print(f"  [bold]Next: {stage.label}[/bold]\n")
+        ui.console.print(f"  [bold bright_yellow]⏭️  Next Up:[/bold bright_yellow] [bold bright_white]{stage.label}[/bold bright_white]\n")
         ui.pause()
 
         result = run_stage(idx, state)
 
         if result == QUIT_SENTINEL:
             state.save()
+            ui.show_session_summary(state)
             return
 
         if result:
@@ -172,6 +176,7 @@ def play_continue(state):
             if stage.stage_type == STAGE_BOSS:
                 if not handle_boss_retry(idx, stage, state):
                     state.save()
+                    ui.show_session_summary(state)
                     return
             else:
                 # Non-boss retry
@@ -179,6 +184,7 @@ def play_continue(state):
                 retry = retry.lower().strip()
                 if retry not in ("y", "yes", "retry", "r"):
                     state.save()
+                    ui.show_session_summary(state)
                     return
                 else:
                     continue  # retry the same stage
@@ -190,27 +196,37 @@ def play_continue(state):
         ui.show_game_complete(state)
         ui.pause()
         generate_cheatsheet(state)
-        ui.console.print("\n  [bold green]📄 Your cheat sheet has been saved to git_cheatsheet.txt![/bold green]")
+        ui.console.print("\n  [bold bright_green]🎁 Rewards saved:[/bold bright_green] [bright_cyan]git_cheatsheet.txt[/bright_cyan] [dim]+[/dim] [bright_magenta]git_mastery_report.txt[/bright_magenta]")
         ui.pause()
+
+    ui.show_session_summary(state)
 
 
 def play_replay(state):
     """Replay a previously cleared stage."""
     cleared = sorted(state.cleared_stages)
     if not cleared:
-        ui.console.print("  [dim]No stages cleared yet![/dim]")
+        ui.console.print("  [italic bright_yellow]No stages cleared yet! Start playing to unlock replays.[/italic bright_yellow]")
         ui.pause()
         return
 
-    ui.console.print("\n  [bold underline]Replay a Stage[/bold underline]\n")
+    ui.console.print("\n  [bold bright_cyan underline]🔁 Replay a Stage[/bold bright_cyan underline]")
+    ui.console.print("  [dim]Practice makes perfect![/dim]\n")
     # Show human-friendly numbering, not raw indices
     menu_map = {}
     for display_num, idx in enumerate(cleared, 1):
         stage = STAGE_MAP[idx]
-        ui.console.print(f"  [{display_num}] {stage.label}")
+        # Color code by stage type
+        if stage.stage_type == STAGE_BOSS:
+            label_color = "bright_red"
+        elif stage.stage_type == STAGE_EXERCISE:
+            label_color = "bright_blue"
+        else:
+            label_color = "bright_cyan"
+        ui.console.print(f"  [bold bright_white][{display_num}][/bold bright_white] [{label_color}]{stage.label}[/{label_color}]")
         menu_map[str(display_num)] = idx
 
-    ui.console.print(f"  [0] Back\n")
+    ui.console.print(f"  [dim][0] Back[/dim]\n")
     choice = ui.get_input("  Choose: ", save_fn=state.save)
 
     if choice == "0" or choice.lower() in ("back", "b", "q"):
@@ -224,23 +240,42 @@ def play_replay(state):
             return
         stage = STAGE_MAP[stage_idx]
         if result:
-            ui.show_stage_cleared(stage.label, "Replayed successfully!")
+            ui.show_stage_cleared(stage.label, "[bright_white]Replayed successfully![/bright_white]")
         else:
             ui.show_stage_failed(stage.label)
     else:
-        ui.console.print("  [red]Invalid choice.[/red]")
+        ui.console.print("  [bold bright_red]❌ Invalid choice.[/bold bright_red]")
+        ui.pause()
+
+
+def play_notebook(state):
+    """View the notebook and optionally save it as a text file."""
+    ui.show_notebook(state)
+
+    if not state.notebook_entries:
+        ui.pause()
+        return
+
+    choice = ui.get_input("  Choose: ", save_fn=state.save).lower().strip()
+    if choice in ("s", "save"):
+        path = generate_notebook_txt(state)
+        if path:
+            ui.console.print(f"  [bold bright_green]✅ Notebook saved to:[/bold bright_green] [bright_cyan]{path}[/bright_cyan]")
+        else:
+            ui.console.print("  [bold bright_red]❌ Nothing to save — notebook is empty.[/bold bright_red]")
         ui.pause()
 
 
 def play_reset(state):
     """Reset all progress."""
-    ui.console.print("\n  [bold red]⚠️  This will DELETE all progress![/bold red]")
+    ui.console.print("\n  [bold bright_red]⚠️  WARNING: This will DELETE all progress![/bold bright_red]")
+    ui.console.print("  [italic bright_yellow]This action cannot be undone.[/italic bright_yellow]")
     confirm = ui.get_input("  Type 'RESET' to confirm: ", save_fn=state.save)
     if confirm == "RESET":
         state.reset()
-        ui.console.print("  [green]Progress reset.[/green]")
+        ui.console.print("  [bold bright_green]✅ Progress reset successfully.[/bold bright_green]")
     else:
-        ui.console.print("  [dim]Cancelled.[/dim]")
+        ui.console.print("  [italic bright_cyan]Reset cancelled.[/italic bright_cyan]")
     ui.pause()
 
 
@@ -254,32 +289,37 @@ def main():
         state = GameState()
         state.load()
     except Exception as e:
-        ui.console.print(f"[red]Error loading game state: {e}[/red]")
-        ui.console.print("[yellow]Starting with fresh save...[/yellow]")
+        ui.console.print(f"[bold bright_red]⚠️  Error loading game state:[/bold bright_red] [bright_yellow]{e}[/bright_yellow]")
+        ui.console.print("[italic bright_cyan]Starting with fresh save...[/italic bright_cyan]")
         state = GameState()
 
     try:
         while True:
-            ui.show_main_menu(state, TOTAL_STAGES)
+            next_stage_label = None
+            if 0 <= state.current_stage_index < TOTAL_STAGES:
+                next_stage_label = STAGE_MAP[state.current_stage_index].label
+            ui.show_main_menu(state, TOTAL_STAGES, next_stage_label)
             choice = ui.get_input("  Choose: ", save_fn=state.save).lower().strip()
 
             if choice in ("c", "start", "continue"):
                 play_continue(state)
             elif choice in ("r", "replay"):
                 play_replay(state)
+            elif choice in ("n", "notebook"):
+                play_notebook(state)
             elif choice in ("x", "reset"):
                 play_reset(state)
             elif choice in ("q", "quit", "exit"):
-                ui.console.print("  [dim]See you next time! 👋[/dim]")
+                ui.console.print("  [bold bright_cyan]👋 See you next time, Git Master![/bold bright_cyan]")
                 break
             else:
-                ui.console.print("  [red]Invalid choice.[/red]")
+                ui.console.print("  [bold bright_red]❌ Invalid choice.[/bold bright_red] [dim]Try again.[/dim]")
                 ui.pause()
     except KeyboardInterrupt:
-        ui.console.print("\n[dim]Interrupted. Saving...[/dim]")
+        ui.console.print("\n[italic bright_cyan]💾 Interrupted. Saving progress...[/italic bright_cyan]")
     except Exception as e:
-        ui.console.print(f"\n[red]Unexpected error: {e}[/red]")
-        ui.console.print("[yellow]Progress will be saved.[/yellow]")
+        ui.console.print(f"\n[bold bright_red]⚠️  Unexpected error:[/bold bright_red] [bright_yellow]{e}[/bright_yellow]")
+        ui.console.print("[italic bright_cyan]Progress will be saved.[/italic bright_cyan]")
         import traceback
         traceback.print_exc()
     finally:
@@ -287,7 +327,7 @@ def main():
         try:
             state.save()
         except Exception as e:
-            ui.console.print(f"[red]Failed to save: {e}[/red]")
+            ui.console.print(f"[bold bright_red]❌ Failed to save:[/bold bright_red] [bright_yellow]{e}[/bright_yellow]")
 
 
 if __name__ == "__main__":

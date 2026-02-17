@@ -5,43 +5,213 @@ from content.models import Exercise, Level, Teaching
 
 
 # ═══════════════════════════════════════════════════════════
-#  SETUP INTRO EXERCISES (not a level)
+#  SETUP INTRO LEVEL (Level 0)
 # ═══════════════════════════════════════════════════════════
 
-SETUP_EXERCISES = [
-    Exercise(
-        type="recall",
-        prompt="What command checks if Git is installed on your system?",
-        answers=["git --version"],
-        sim_output="$ git --version\ngit version 2.43.0.windows.1",
+SETUP_LEVEL = Level(
+    number=0,
+    name="Git Setup",
+    tagline="Configure Git before you begin.",
+    concept=(
+        "Before using Git, you need to set up your identity (name and email).\n"
+        "These details get attached to every commit you make, so people know who made changes.\n"
+        "You only need to do this once — the settings are saved globally on your computer."
     ),
-    Exercise(
-        type="recall",
-        prompt="Set your Git username to 'Player One'.",
-        answers=[
-            'git config --global user.name "Player One"',
-            "git config --global user.name 'Player One'",
-            "git config --global user.name Player One",
-        ],
-        sim_output="$ git config --global user.name \"Player One\"\n(no output — config saved)",
-    ),
-    Exercise(
-        type="recall",
-        prompt="Set your Git email to 'player@gitgrind.com'.",
-        answers=[
-            'git config --global user.email "player@gitgrind.com"',
-            "git config --global user.email 'player@gitgrind.com'",
-            "git config --global user.email player@gitgrind.com",
-        ],
-        sim_output="$ git config --global user.email \"player@gitgrind.com\"\n(no output — config saved)",
-    ),
-    Exercise(
-        type="recall",
-        prompt="What command shows all your Git configuration settings?",
-        answers=["git config --list", "git config -l"],
-        sim_output="$ git config --list\nuser.name=Player One\nuser.email=player@gitgrind.com\ncore.autocrlf=true\n...",
-    ),
-]
+    commands_taught=["git --version", "git config --global user.name", "git config --global user.email", "git config --list"],
+    teachings=[
+        Teaching(
+            command="git --version",
+            syntax="git --version",
+            explanation=(
+                "This command checks if Git is installed on your system and shows which version you have.\n"
+                "If Git is installed, you'll see something like 'git version 2.43.0'.\n"
+                "If it says 'command not found', you need to install Git first.\n"
+                "\n"
+                "Run this anytime you want to verify your Git installation or check the version."
+            ),
+            example_output=(
+                "$ git --version\n"
+                "git version 2.43.0.windows.1"
+            ),
+            pro_tip="If you're getting 'command not found', download Git from git-scm.com and restart your terminal.",
+        ),
+        Teaching(
+            command="git config --global user.name",
+            syntax='git config --global user.name "Your Name"',
+            explanation=(
+                "This sets your name in Git's global configuration.\n"
+                "Every commit you make will be tagged with this name, so other developers\n"
+                "know who made the changes.\n"
+                "\n"
+                "The --global flag means this setting applies to ALL repositories on your\n"
+                "computer. You only need to set it once.\n"
+                "\n"
+                "Use your real name or GitHub username — make it professional!"
+            ),
+            example_output=(
+                '$ git config --global user.name "Player One"\n'
+                "(no output — config saved)"
+            ),
+            pro_tip="You can check your current name with: git config user.name",
+        ),
+        Teaching(
+            command="git config --global user.email",
+            syntax='git config --global user.email "you@example.com"',
+            explanation=(
+                "This sets your email address in Git's global configuration.\n"
+                "Like your name, this email gets attached to every commit you make.\n"
+                "\n"
+                "If you're using GitHub, use the SAME email you registered with on GitHub.\n"
+                "This ensures your commits are properly linked to your GitHub profile.\n"
+                "\n"
+                "The --global flag saves it for all your projects on this computer."
+            ),
+            example_output=(
+                '$ git config --global user.email "player@gitgrind.com"\n'
+                "(no output — config saved)"
+            ),
+            pro_tip="If you're worried about privacy, GitHub lets you use a private 'noreply' email address.",
+        ),
+        Teaching(
+            command="git config --list",
+            syntax="git config --list",
+            explanation=(
+                "This displays ALL your Git configuration settings.\n"
+                "You'll see your name, email, and many other settings Git uses.\n"
+                "\n"
+                "Use this to verify your setup or troubleshoot configuration issues.\n"
+                "It's also helpful when you forget what email or name you configured."
+            ),
+            example_output=(
+                "$ git config --list\n"
+                "user.name=Player One\n"
+                "user.email=player@gitgrind.com\n"
+                "core.autocrlf=true\n"
+                "color.ui=auto\n"
+                "..."
+            ),
+            pro_tip="Too much output? Use 'git config user.name' and 'git config user.email' to check just those specific values.",
+        ),
+    ],
+    exercises=[
+        Exercise(
+            type="recall",
+            prompt="What command checks if Git is installed on your system?",
+            answers=["git --version"],
+            hint="Starts with 'git --v...'",
+            explanation="'git --version' shows the installed Git version. If Git isn't installed, you'll get an error instead.",
+            sim_output="$ git --version\ngit version 2.43.0.windows.1",
+        ),
+        Exercise(
+            type="recall",
+            prompt="Set your Git username to 'Player One'.",
+            answers=[
+                'git config --global user.name "Player One"',
+                "git config --global user.name 'Player One'",
+                "git config --global user.name Player One",
+            ],
+            hint="git config --global user.name ...",
+            explanation="'git config --global user.name' sets your name for all Git repos on your computer. This name appears on every commit you make.",
+            sim_output="$ git config --global user.name \"Player One\"\n(no output — config saved)",
+        ),
+        Exercise(
+            type="recall",
+            prompt="Set your Git email to 'player@gitgrind.com'.",
+            answers=[
+                'git config --global user.email "player@gitgrind.com"',
+                "git config --global user.email 'player@gitgrind.com'",
+                "git config --global user.email player@gitgrind.com",
+            ],
+            hint="git config --global user.email ...",
+            explanation="'git config --global user.email' sets your email for all repos. Use the same email as your GitHub account to link commits to your profile.",
+            sim_output="$ git config --global user.email \"player@gitgrind.com\"\n(no output — config saved)",
+        ),
+        Exercise(
+            type="recall",
+            prompt="What command shows all your Git configuration settings?",
+            answers=["git config --list", "git config -l"],
+            hint="git config --l...",
+            explanation="'git config --list' displays all config settings. Great for verifying your setup or troubleshooting.",
+            sim_output="$ git config --list\nuser.name=Player One\nuser.email=player@gitgrind.com\ncore.autocrlf=true\n...",
+        ),
+    ],
+    drills=[
+        Exercise(
+            type="recall",
+            prompt="Check your Git version.",
+            answers=["git --version"],
+            explanation="Shows the version of Git installed on your system.",
+            sim_output="git version 2.43.0.windows.1"
+        ),
+        Exercise(
+            type="recall",
+            prompt="Set your name to 'Alex Dev'.",
+            answers=['git config --global user.name "Alex Dev"', "git config --global user.name 'Alex Dev'", "git config --global user.name Alex Dev"],
+            explanation="Configures your identity for all commits.",
+            sim_output="(config saved)"
+        ),
+        Exercise(
+            type="recall",
+            prompt="List all Git settings.",
+            answers=["git config --list", "git config -l"],
+            explanation="Shows everything Git has configured.",
+            sim_output="user.name=Alex Dev\nuser.email=alex@example.com\n..."
+        ),
+        Exercise(
+            type="recall",
+            prompt="Verify Git is installed.",
+            answers=["git --version"],
+            explanation="Confirms Git is available on your system.",
+            sim_output="git version 2.43.0"
+        ),
+        Exercise(
+            type="recall",
+            prompt="Set email to 'dev@example.com'.",
+            answers=['git config --global user.email "dev@example.com"', "git config --global user.email 'dev@example.com'", "git config --global user.email dev@example.com"],
+            explanation="Sets your email globally.",
+            sim_output="(config saved)"
+        ),
+        Exercise(
+            type="recall",
+            prompt="Show all config values.",
+            answers=["git config --list", "git config -l"],
+            explanation="Displays your entire Git configuration.",
+            sim_output="user.name=...\nuser.email=...\ncore.autocrlf=..."
+        ),
+        Exercise(
+            type="recall",
+            prompt="Configure username to 'Sam'.",
+            answers=['git config --global user.name "Sam"', "git config --global user.name 'Sam'", "git config --global user.name Sam"],
+            explanation="Sets your global username.",
+            sim_output="(config saved)"
+        ),
+        Exercise(
+            type="recall",
+            prompt="Check Git version number.",
+            answers=["git --version"],
+            explanation="Shows which version of Git you have.",
+            sim_output="git version 2.43.0.windows.1"
+        ),
+        Exercise(
+            type="recall",
+            prompt="View configuration list.",
+            answers=["git config --list", "git config -l"],
+            explanation="Lists all Git settings you've configured.",
+            sim_output="user.name=Sam\nuser.email=dev@example.com\n..."
+        ),
+        Exercise(
+            type="recall",
+            prompt="Set email to 'you@mail.com'.",
+            answers=['git config --global user.email "you@mail.com"', "git config --global user.email 'you@mail.com'", "git config --global user.email you@mail.com"],
+            explanation="Configures your global email address.",
+            sim_output="(config saved)"
+        ),
+    ],
+    drill_pass=(6, 8),  # Lighter requirement for setup level
+)
+
+# Keep backwards compatibility for old code that references SETUP_EXERCISES
+SETUP_EXERCISES = SETUP_LEVEL.exercises
 
 
 # ═══════════════════════════════════════════════════════════
@@ -237,6 +407,7 @@ LEVEL_2 = Level(
             prompt="Stage a file called 'app.py' for commit.",
             answers=["git add app.py"],
             hint="git add <filename>",
+            explanation="'git add app.py' stages only that file. Staging lets you control exactly what goes into the next commit.",
             sim_output="$ git add app.py\n(no output — file staged)\n\n$ git status\nChanges to be committed:\n  new file: app.py",
         ),
         Exercise(
@@ -244,18 +415,21 @@ LEVEL_2 = Level(
             prompt="Stage ALL changed files in the current directory.",
             answers=["git add .", "git add -A", "git add --all"],
             hint="Use a dot to mean 'everything'",
+            explanation="The dot stages all changes from your current directory downward. Use 'git status' first so you don't stage accidental files.",
             sim_output="$ git add .\n(no output — all files staged)",
         ),
         Exercise(
             type="scenario",
             prompt="You edited app.py, style.css, and test.py. You only want to stage style.css. What command?",
             answers=["git add style.css"],
+            explanation="Use file-specific staging when you want a focused commit. 'git add style.css' stages only style.css and leaves other edits unstaged.",
             sim_output="$ git add style.css\n\n$ git status\nChanges to be committed:\n  modified: style.css\n\nChanges not staged for commit:\n  modified: app.py\n  modified: test.py",
         ),
         Exercise(
             type="multi_choice",
             prompt="'git add .' stages:",
             answers=["c"],
+            explanation="'git add .' stages new, modified, and deleted files in the current directory and subdirectories.",
             choices=["a) Only new files", "b) Only modified files", "c) All changes in current directory and subdirectories"],
         ),
     ],
@@ -384,18 +558,21 @@ LEVEL_3 = Level(
                 "git commit -m 'initial commit'",
             ],
             hint="git commit -m \"message\"",
+            explanation="'git commit -m' saves a snapshot of everything already staged. The message should clearly describe the change.",
             sim_output="$ git commit -m \"initial commit\"\n[main (root-commit) a1b2c3d] initial commit\n 3 files changed, 42 insertions(+)\n create mode 100644 app.py\n create mode 100644 README.md\n create mode 100644 .gitignore",
         ),
         Exercise(
             type="recall",
             prompt="View the full commit history.",
             answers=["git log"],
+            explanation="'git log' shows full commit metadata: hash, author, date, and message. It's your timeline of repository history.",
             sim_output="$ git log\ncommit a1b2c3d (HEAD -> main)\nAuthor: Player One <player@gitgrind.com>\nDate:   Wed Feb 12 12:00:00 2026\n\n    initial commit",
         ),
         Exercise(
             type="recall",
             prompt="View commit history in compact one-line format.",
             answers=["git log --oneline"],
+            explanation="'git log --oneline' is the quickest way to scan history: one line per commit with short hash + message.",
             sim_output="$ git log --oneline\na1b2c3d (HEAD -> main) initial commit",
         ),
         Exercise(
@@ -404,6 +581,7 @@ LEVEL_3 = Level(
             answers=["git add .", "git add <file>", "git add"],
             error_output="$ git commit -m \"fix bug\"\nOn branch main\nnothing to commit, working tree clean",
             hint="Files need to be staged before committing",
+            explanation="Commit only includes staged changes. If nothing is staged, Git says 'nothing to commit'. Run 'git add' first.",
         ),
         Exercise(
             type="scenario",
@@ -414,6 +592,7 @@ LEVEL_3 = Level(
                 "git add . && git commit -m \"fix login bug\"",
                 "git add . && git commit -m 'fix login bug'",
             ],
+            explanation="The standard flow is stage first, then commit. You can stage a single file for precision or all files if intended.",
             sim_output="$ git add app.py\n$ git commit -m \"fix login bug\"\n[main e4f5g6h] fix login bug\n 1 file changed, 5 insertions(+), 2 deletions(-)",
         ),
     ],
@@ -536,18 +715,21 @@ LEVEL_4 = Level(
             type="scenario",
             prompt="You want Git to ignore all .log files. What line do you add to .gitignore?",
             answers=["*.log"],
+            explanation="'*.log' is a wildcard pattern meaning any filename ending in .log should be ignored.",
             sim_output=".gitignore:\n*.log\n\n$ git status\n(log files no longer show as untracked)",
         ),
         Exercise(
             type="scenario",
             prompt="You want to ignore the entire node_modules/ directory. What pattern?",
             answers=["node_modules/", "node_modules"],
+            explanation="Directory patterns like 'node_modules/' prevent huge dependency folders from polluting commits.",
             sim_output=".gitignore:\nnode_modules/\n\n$ git status\n(node_modules no longer listed)",
         ),
         Exercise(
             type="scenario",
             prompt="You want to ignore .env files (they contain secrets). What pattern?",
             answers=[".env"],
+            explanation="'.env' files often contain API keys and credentials, so they should never be version-controlled.",
             sim_output=".gitignore:\n.env",
         ),
         Exercise(
@@ -556,6 +738,7 @@ LEVEL_4 = Level(
             answers=["git rm --cached .env"],
             error_output="$ git status\nChanges not staged for commit:\n  modified: .env",
             hint="You need to remove it from tracking (but keep the file on disk)",
+            explanation=".gitignore only affects untracked files. For already-tracked files, remove from index with 'git rm --cached'.",
         ),
     ],
     drills=[
@@ -660,24 +843,28 @@ LEVEL_5 = Level(
             prompt="View unstaged changes in your files.",
             answers=["git diff"],
             hint="Just two words...",
+            explanation="'git diff' shows edits in your working directory that are not staged yet.",
             sim_output="$ git diff\ndiff --git a/app.py b/app.py\n--- a/app.py\n+++ b/app.py\n@@ -1,3 +1,4 @@\n import os\n+import sys\n \n def main():\n-    print('hello')\n+    print('hello world')",
         ),
         Exercise(
             type="recall",
             prompt="View changes that are already staged (ready to be committed).",
             answers=["git diff --staged", "git diff --cached"],
+            explanation="Use '--staged' (or '--cached') to preview exactly what will be included in the next commit.",
             sim_output="$ git diff --staged\ndiff --git a/app.py b/app.py\n--- a/app.py\n+++ b/app.py\n@@ -1,3 +1,4 @@\n+import sys",
         ),
         Exercise(
             type="scenario",
             prompt="You modified a file and staged it. Now you want to see what will go into the next commit. What command?",
             answers=["git diff --staged", "git diff --cached"],
+            explanation="Once staged, regular 'git diff' won't show it. Use 'git diff --staged' for the commit preview.",
             sim_output="(shows staged diff)",
         ),
         Exercise(
             type="multi_choice",
             prompt="In diff output, what does a line starting with '+' mean?",
             answers=["b"],
+            explanation="A '+' line is an added line in the new version of the file. '-' lines are deletions.",
             choices=["a) The line was deleted", "b) The line was added", "c) The line was unchanged"],
         ),
     ],
@@ -827,12 +1014,14 @@ LEVEL_6 = Level(
             type="recall",
             prompt="Show commit history with each commit on a single line.",
             answers=["git log --oneline"],
+            explanation="'--oneline' compresses each commit into short hash + message, ideal for quick scans.",
             sim_output="$ git log --oneline\na1b2c3d fix login\ne4f5g6h add homepage\ni7j8k9l initial commit",
         ),
         Exercise(
             type="recall",
             prompt="Show commit history with a visual branch graph.",
             answers=["git log --oneline --graph", "git log --oneline --graph --all", "git log --graph"],
+            explanation="'--graph' draws branch/merge lines so you can understand divergence and merge points.",
             sim_output="$ git log --oneline --graph --all\n* a1b2c3d (HEAD -> main) fix login\n| * d4e5f6g (feature) add signup\n|/\n* e4f5g6h add homepage\n* i7j8k9l initial commit",
         ),
         Exercise(
@@ -840,6 +1029,7 @@ LEVEL_6 = Level(
             prompt="Show commits by a specific author.",
             blank_template='git log --____="John"',
             answers=["author"],
+            explanation="The '--author' filter narrows history to commits created by a specific person.",
             sim_output='$ git log --author="John"\ncommit abc...\nAuthor: John <john@mail.com>',
         ),
         Exercise(
@@ -847,18 +1037,21 @@ LEVEL_6 = Level(
             prompt="Show commits from the last 2 weeks.",
             blank_template='git log --____="2 weeks ago"',
             answers=["since"],
+            explanation="Use '--since' with natural time strings to focus on recent work windows.",
         ),
         Exercise(
             type="fill_blank",
             prompt="Search commit messages for the word 'fix'.",
             blank_template='git log --____="fix"',
             answers=["grep"],
+            explanation="'--grep' searches commit messages for keywords, perfect for finding bug-fix commits quickly.",
             sim_output='$ git log --grep="fix"\ncommit a1b2c3d\n    fix login bug\ncommit x9y8z7w\n    fix navbar alignment',
         ),
         Exercise(
             type="recall",
             prompt="Show commit history with file change statistics (how many files changed, insertions, deletions).",
             answers=["git log --stat"],
+            explanation="'--stat' summarizes scope per commit without showing full patches, useful for quick impact review.",
             sim_output="$ git log --stat\ncommit a1b2c3d\n    fix login\n\n app.py | 5 +++--\n 1 file changed, 3 insertions(+), 2 deletions(-)",
         ),
     ],
@@ -890,6 +1083,7 @@ LEVEL_6 = Level(
 # ── Export all basics levels ─────────────────────────────
 
 BASICS_LEVELS = {
+    0: SETUP_LEVEL,  # Setup is treated as Level 0
     1: LEVEL_1,
     2: LEVEL_2,
     3: LEVEL_3,

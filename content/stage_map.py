@@ -1,5 +1,5 @@
 """
-GitGrind — Ordered list of all 31 stages in the game.
+GitGrind — Ordered list of all 35 stages in the game.
 Defines the master progression: setup → levels → exercises → bosses.
 """
 from content.models import Stage, STAGE_SETUP, STAGE_LEVEL, STAGE_EXERCISE, STAGE_BOSS
@@ -40,6 +40,9 @@ STAGE_MAP = [
     # ── Boss Fight 2 ─────────────────────────────────────
     Stage(stage_type=STAGE_BOSS,     data_key=2,  label="⚔️  Boss Fight 2 — Three-Way Collision"),
 
+    # ── Retention Sprint I (spaced review) ──────────────
+    Stage(stage_type=STAGE_EXERCISE, data_key=6,  label="💪 Exercise Round 6 — Retention Sprint I"),
+
     # ── Remotes (Levels 11-14) ───────────────────────────
     Stage(stage_type=STAGE_LEVEL,    data_key=11, label="Level 11 — Remotes & Origin"),
     Stage(stage_type=STAGE_LEVEL,    data_key=12, label="Level 12 — Clone"),
@@ -59,6 +62,7 @@ STAGE_MAP = [
     Stage(stage_type=STAGE_LEVEL,    data_key=18, label="Level 18 — Reflog"),
     Stage(stage_type=STAGE_LEVEL,    data_key=19, label="Level 19 — Rebase"),
     Stage(stage_type=STAGE_LEVEL,    data_key=20, label="Level 20 — Pro Moves"),
+    Stage(stage_type=STAGE_LEVEL,    data_key=21, label="Level 21 — Maintenance & Team Flow"),
 
     # ── Exercise Round 5 ─────────────────────────────────
     Stage(stage_type=STAGE_EXERCISE, data_key=5,  label="💪 Exercise Round 5 — The Final Grind"),
@@ -66,6 +70,12 @@ STAGE_MAP = [
     # ── Boss Fight 4 ─────────────────────────────────────
     Stage(stage_type=STAGE_BOSS,     data_key=4,  label="⚔️  Boss Fight 4 — Detached HEAD Nightmare"),
 
+    # ── Retention Marathon (final spaced review) ────────
+    Stage(stage_type=STAGE_EXERCISE, data_key=7,  label="💪 Exercise Round 7 — Retention Marathon"),
+
     # ── THE FINAL BOSS ───────────────────────────────────
     Stage(stage_type=STAGE_BOSS,     data_key=5,  label="⚔️  Boss Fight 5 — THE FINAL BOSS"),
+
+    # ── ULTIMATE FINAL BOSS ──────────────────────────────
+    Stage(stage_type=STAGE_BOSS,     data_key=6,  label="⚔️  Boss Fight 6 — COMMAND ARENA (GRAND FINAL)"),
 ]

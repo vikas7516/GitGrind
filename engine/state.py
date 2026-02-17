@@ -39,6 +39,7 @@ def _default_state() -> Dict[str, Any]:
             "time_played_seconds": 0,
         },
         "commands_learned": [],
+        "notebook_entries": {},  # {command: {syntax, explanation, pro_tip}}
         "game_complete": False,
     }
 
@@ -102,6 +103,12 @@ class GameState:
     def __init__(self):
         self.data = _default_state()
         self._session_start = time.time()
+        # Session-level counters (not persisted — reset each play session)
+        self._session_correct = 0
+        self._session_wrong = 0
+        self._session_skipped = 0
+        self._session_stages_cleared = 0
+        self._session_active = False
 
     # ── Persistence ──────────────────────────────────────
 
@@ -181,6 +188,7 @@ class GameState:
             self.data["cleared_stages"].append(stage_index)
         if stage_index + 1 > self.data["current_stage_index"]:
             self.data["current_stage_index"] = stage_index + 1
+        self._session_stages_cleared += 1
         self.save()
 
     def show_save_indicator(self):
@@ -205,6 +213,9 @@ class GameState:
         if self.data["stats"]["current_streak"] > self.data["stats"].get("best_streak", 0):
             self.data["stats"]["best_streak"] = self.data["stats"]["current_streak"]
 
+        # Session tracking
+        self._session_correct += 1
+
     def record_wrong(self) -> None:
         self.data["stats"]["total_wrong"] += 1
         self.data["stats"]["total_commands_typed"] += 1
@@ -212,13 +223,68 @@ class GameState:
         # Reset streak
         self.data["stats"]["current_streak"] = 0
 
+        # Session tracking
+        self._session_wrong += 1
+
     def record_hint(self) -> None:
         self.data["stats"]["hints_used"] += 1
+
+    def record_skip(self) -> None:
+        """Record that an exercise was skipped (for session summary)."""
+        self._session_skipped += 1
 
     def learn_commands(self, commands):
         for cmd in commands:
             if cmd not in self.data["commands_learned"]:
                 self.data["commands_learned"].append(cmd)
+
+    # ── Notebook ─────────────────────────────────────────
+
+    def add_notebook_entry(self, teaching) -> None:
+        """Save a teaching to the notebook for later reference."""
+        self.data.setdefault("notebook_entries", {})
+        self.data["notebook_entries"][teaching.command] = {
+            "syntax": teaching.syntax,
+            "explanation": teaching.explanation,
+            "pro_tip": teaching.pro_tip,
+        }
+
+    @property
+    def notebook_entries(self) -> dict:
+        """Get all notebook entries."""
+        return self.data.get("notebook_entries", {})
+
+    # ── Session Tracking ─────────────────────────────────
+
+    def start_session(self) -> None:
+        """Reset session-level counters for a new play session."""
+        self._session_correct = 0
+        self._session_wrong = 0
+        self._session_skipped = 0
+        self._session_stages_cleared = 0
+        self._session_active = True
+
+    @property
+    def session_correct(self):
+        return self._session_correct
+
+    @property
+    def session_wrong(self):
+        return self._session_wrong
+
+    @property
+    def session_skipped(self):
+        return self._session_skipped
+
+    @property
+    def session_stages_cleared(self):
+        return self._session_stages_cleared
+
+    @property
+    def session_active(self):
+        return self._session_active
+
+    # ── Computed Properties ──────────────────────────────
 
     @property
     def accuracy(self) -> int:

@@ -941,6 +941,272 @@ LEVEL_20 = Level(
 )
 
 
+# ═══════════════════════════════════════════════════════════
+#  LEVEL 21 — Maintenance & Team Flow
+# ═══════════════════════════════════════════════════════════
+
+LEVEL_21 = Level(
+    number=21,
+    name="Maintenance & Team Flow",
+    tagline="Missing pro commands you will actually use.",
+    concept=(
+        "This level fills practical gaps: inspect commits faster, clean safely, compare branches, and debug regressions.\n"
+        "You'll also learn team-flow commands that keep repositories clean over time.\n"
+        "These are the commands that stop you from getting stuck in real projects."
+    ),
+    commands_taught=[
+        "git show <hash>", "git mv <old> <new>", "git clean -fd", "git branch -m <old> <new>",
+        "git grep <pattern>", "git log --follow <file>", "git diff <branch1>..<branch2>",
+        "git fetch --prune", "git merge --squash <branch>",
+        "git rebase --onto <newbase> <upstream> <branch>",
+        "git bisect start|good|bad|reset", ".git/info/exclude", "pull request workflow"
+    ],
+    teachings=[
+        Teaching(
+            command="git show <hash>",
+            syntax="git show <commit-hash>",
+            explanation=(
+                "Need to inspect one commit quickly? 'git show' gives commit message, metadata, and patch in one shot.\n"
+                "It's faster than opening log then diff separately and is used constantly during review and debugging."
+            ),
+            example_output=(
+                "$ git show a1b2c3d\n"
+                "commit a1b2c3d...\n"
+                "Author: Dev <dev@team.com>\n"
+                "\n"
+                "diff --git a/app.py b/app.py\n"
+                "@@ -10,2 +10,4 @@"
+            ),
+            pro_tip="Use '--stat' for a compact summary: git show --stat <hash>",
+        ),
+        Teaching(
+            command="git mv <old> <new>",
+            syntax="git mv old_name new_name",
+            explanation=(
+                "Renames or moves a file while staging the change in one step.\n"
+                "Git can detect renames automatically, but 'git mv' is explicit and keeps your workflow clean."
+            ),
+            example_output=(
+                "$ git mv app_old.py app.py\n"
+                "$ git status\n"
+                "Changes to be committed:\n"
+                "  renamed: app_old.py -> app.py"
+            ),
+        ),
+        Teaching(
+            command="git clean -fd",
+            syntax="git clean -fd",
+            explanation=(
+                "Removes untracked files (-f) and directories (-d).\n"
+                "Great for resetting messy working trees, but destructive if used carelessly."
+            ),
+            example_output=(
+                "$ git clean -nd\n"
+                "Would remove build/\n"
+                "Would remove temp.log\n"
+                "$ git clean -fd\n"
+                "Removing build/\n"
+                "Removing temp.log"
+            ),
+            pro_tip="Preview first with -n: git clean -nd",
+        ),
+        Teaching(
+            command="git branch -m",
+            syntax="git branch -m old-name new-name",
+            explanation=(
+                "Renames a local branch. Use this when branch naming is unclear or inconsistent.\n"
+                "Cleaner branch names improve pull requests and team communication."
+            ),
+            example_output=(
+                "$ git branch -m feat-auth feature/auth\n"
+                "$ git branch\n"
+                "* feature/auth\n"
+                "  main"
+            ),
+        ),
+        Teaching(
+            command="git grep",
+            syntax='git grep "pattern"',
+            explanation=(
+                "Searches tracked files fast using Git's index-aware search.\n"
+                "Excellent for finding symbol usages without searching generated or ignored junk."
+            ),
+            example_output=(
+                '$ git grep "login"\n'
+                "auth.py:def login(user):\n"
+                "routes.py:from auth import login"
+            ),
+        ),
+        Teaching(
+            command="git log --follow <file>",
+            syntax="git log --follow <file>",
+            explanation=(
+                "Shows file history across renames.\n"
+                "Without '--follow', history can look broken after file moves."
+            ),
+            example_output=(
+                "$ git log --follow auth.py --oneline\n"
+                "c3d4e5f rename auth_old.py -> auth.py\n"
+                "a1b2c3d add auth module"
+            ),
+        ),
+        Teaching(
+            command="git diff <a>..<b>",
+            syntax="git diff main..feature/auth",
+            explanation=(
+                "Compares two branch tips to show what differs between them.\n"
+                "Useful before opening PRs or reviewing branch scope."
+            ),
+            example_output=(
+                "$ git diff main..feature/auth\n"
+                "diff --git a/auth.py b/auth.py\n"
+                "@@ -0,0 +1,42 @@"
+            ),
+        ),
+        Teaching(
+            command="git fetch --prune",
+            syntax="git fetch --prune",
+            explanation=(
+                "Fetches updates and removes stale remote-tracking branches that were deleted on remote.\n"
+                "Keeps branch lists clean and prevents stale branch confusion."
+            ),
+            example_output=(
+                "$ git fetch --prune\n"
+                "From https://github.com/team/project\n"
+                " - [deleted]     (none)     -> origin/old-feature"
+            ),
+        ),
+        Teaching(
+            command="git merge --squash",
+            syntax="git merge --squash feature/auth",
+            explanation=(
+                "Applies all branch changes as one staged change without creating a merge commit.\n"
+                "Perfect when you want a clean, single commit on main."
+            ),
+            example_output=(
+                "$ git merge --squash feature/auth\n"
+                "Squash commit -- not updating HEAD\n"
+                "$ git commit -m \"feat: auth\""
+            ),
+        ),
+        Teaching(
+            command="git rebase --onto",
+            syntax="git rebase --onto main feature/base feature/child",
+            explanation=(
+                "Advanced move: relocate a subset of commits from one base to another.\n"
+                "Used when branch stacks change and you need surgical history cleanup."
+            ),
+            example_output=(
+                "$ git rebase --onto main feature/base feature/child\n"
+                "Successfully rebased and updated refs/heads/feature/child."
+            ),
+        ),
+        Teaching(
+            command="git bisect",
+            syntax="git bisect start && git bisect bad && git bisect good <hash>",
+            explanation=(
+                "Finds the exact commit that introduced a bug using binary search through history.\n"
+                "Huge time saver when regressions appear in large commit ranges."
+            ),
+            example_output=(
+                "$ git bisect start\n"
+                "$ git bisect bad\n"
+                "$ git bisect good a1b2c3d\n"
+                "Bisecting: 7 revisions left to test after this"
+            ),
+            pro_tip="Always end with 'git bisect reset' to return to your original branch.",
+        ),
+        Teaching(
+            command=".git/info/exclude",
+            syntax="edit .git/info/exclude",
+            explanation=(
+                "Local ignore rules that are NOT committed.\n"
+                "Use this for personal editor/temp files you don't want in team .gitignore."
+            ),
+            example_output=(
+                "$ cat .git/info/exclude\n"
+                "*.local\n"
+                ".vscode/"
+            ),
+        ),
+        Teaching(
+            command="Pull Request workflow",
+            syntax="push branch -> open PR -> review -> merge",
+            explanation=(
+                "In team workflows, you usually don't push directly to main.\n"
+                "You push a feature branch, open a Pull Request, get review, then merge."
+            ),
+            example_output=(
+                "$ git push -u origin feature/auth\n"
+                "(Open PR on GitHub)\n"
+                "(Review approved)\n"
+                "(Merged to main)"
+            ),
+        ),
+    ],
+    exercises=[
+        Exercise(type="recall", prompt="Inspect commit details for hash a1b2c3d.",
+                 answers=["git show a1b2c3d"],
+                 explanation="'git show' is the fastest way to inspect one commit end-to-end."),
+        Exercise(type="recall", prompt="Rename 'old_name.py' to 'new_name.py' with Git tracking.",
+                 answers=["git mv old_name.py new_name.py"],
+                 explanation="'git mv' renames and stages the change."),
+        Exercise(type="recall", prompt="Delete untracked files and directories.",
+                 answers=["git clean -fd"],
+                 explanation="Use with care. Preview first with -nd."),
+        Exercise(type="recall", prompt="Rename local branch 'feat-auth' to 'feature/auth'.",
+                 answers=["git branch -m feat-auth feature/auth"],
+                 explanation="Branch renaming keeps history clean and understandable."),
+        Exercise(type="recall", prompt="Search tracked files for the text 'token'.",
+                 answers=['git grep "token"', "git grep 'token'", "git grep token"],
+                 explanation="'git grep' is fast and focused on tracked source files."),
+        Exercise(type="recall", prompt="Show history of 'auth.py' across renames.",
+                 answers=["git log --follow auth.py"],
+                 explanation="--follow keeps file history connected after rename."),
+        Exercise(type="recall", prompt="Compare differences between main and feature/auth.",
+                 answers=["git diff main..feature/auth"],
+                 explanation="Branch-range diff previews PR scope."),
+        Exercise(type="recall", prompt="Fetch updates and prune deleted remote-tracking branches.",
+                 answers=["git fetch --prune"],
+                 explanation="Prevents stale remote branches lingering locally."),
+        Exercise(type="recall", prompt="Squash-merge branch 'feature/auth' into current branch.",
+                 answers=["git merge --squash feature/auth"],
+                 explanation="Applies all changes as one commit candidate."),
+        Exercise(type="scenario", prompt="After pushing feature/auth, what is the next team step?",
+                 answers=["open pull request", "open a pull request", "create pull request", "create a pull request"],
+                 explanation="In collaborative flow, push branch then open PR for review."),
+        Exercise(type="scenario", prompt="Start bisect and mark current commit as bad.",
+                 answers=["git bisect start && git bisect bad"],
+                 explanation="Bisect starts binary search to locate regression commit."),
+        Exercise(type="recall", prompt="Finish bisect mode and return to normal state.",
+                 answers=["git bisect reset"],
+                 explanation="Always reset after bisect so HEAD returns to original branch."),
+    ],
+    drills=[
+        Exercise(type="recall", prompt="Show commit c0ffee1.", answers=["git show c0ffee1"],
+                 explanation="Inspect single-commit details quickly."),
+        Exercise(type="recall", prompt="Rename branch old-api to feature/api.", answers=["git branch -m old-api feature/api"],
+                 explanation="Clean branch names improve collaboration."),
+        Exercise(type="recall", prompt="Search tracked files for 'TODO'.", answers=["git grep TODO", 'git grep "TODO"', "git grep 'TODO'"],
+                 explanation="Codebase search via Git index."),
+        Exercise(type="recall", prompt="Compare main and release/v2.", answers=["git diff main..release/v2"],
+                 explanation="Branch-range comparison before release decisions."),
+        Exercise(type="recall", prompt="Prune stale remote refs while fetching.", answers=["git fetch --prune"],
+                 explanation="Keeps origin/* list accurate."),
+        Exercise(type="recall", prompt="Squash merge branch feature/ui.", answers=["git merge --squash feature/ui"],
+                 explanation="Single commit from many branch commits."),
+        Exercise(type="recall", prompt="Move api_old.py to api.py with tracking.", answers=["git mv api_old.py api.py"],
+                 explanation="Rename + stage in one command."),
+        Exercise(type="recall", prompt="Show renamed-file history for routes.py.", answers=["git log --follow routes.py"],
+                 explanation="Follow history through rename operations."),
+        Exercise(type="recall", prompt="Delete untracked files and dirs now.", answers=["git clean -fd"],
+                 explanation="Dangerous reset for untracked clutter."),
+        Exercise(type="recall", prompt="Exit bisect mode.", answers=["git bisect reset"],
+                 explanation="Return repository to normal state."),
+    ],
+)
+
+
 ADVANCED_LEVELS = {
     15: LEVEL_15,
     16: LEVEL_16,
@@ -948,4 +1214,5 @@ ADVANCED_LEVELS = {
     18: LEVEL_18,
     19: LEVEL_19,
     20: LEVEL_20,
+    21: LEVEL_21,
 }
