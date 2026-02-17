@@ -44,10 +44,9 @@ htmlcov/
 .tox/
 .nox/
 
-# Game data (exclude save files)
+# Game data (user-generated files)
 save_data.json
-save_data.json.bak
-git_cheatsheet.txt
+git_notebook.txt
 
 # Distribution / packaging
 *.egg-info/
@@ -68,4 +67,3 @@ build/
 *.tmp
 *.bak
 ~*
-

@@ -7,7 +7,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-import shutil
 import tempfile
 import time
 from datetime import datetime
@@ -18,7 +17,6 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 SAVE_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "save_data.json")
-SAVE_BACKUP = SAVE_FILE + ".bak"
 
 
 def _default_state() -> Dict[str, Any]:
@@ -26,6 +24,7 @@ def _default_state() -> Dict[str, Any]:
         "current_stage_index": 0,
         "cleared_stages": [],
         "setup_complete": False,
+        "glossary_seen": False,
         "stats": {
             "total_correct": 0,
             "total_wrong": 0,
@@ -68,14 +67,6 @@ def _load_json(path: str) -> Dict[str, Any]:
 
 def _atomic_write_json(path: str, data: Dict[str, Any]) -> bool:
     dir_path = os.path.dirname(path)
-
-    # Create backup FIRST, before writing temp file (prevents stale backup race condition)
-    if os.path.exists(path):
-        try:
-            shutil.copy2(path, SAVE_BACKUP)
-        except OSError as e:
-            logger.warning("Failed to write backup save: %s", e)
-
     fd, temp_path = tempfile.mkstemp(prefix=".gitgrind_save_", dir=dir_path)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -128,30 +119,18 @@ class GameState:
                 self._session_start = time.time()
                 return True
             except (ValueError, json.JSONDecodeError, OSError, IOError, KeyError, TypeError) as e:
-                logger.warning("Save file corrupted, attempting backup: %s", e)
-
-                if os.path.exists(SAVE_BACKUP):
-                    try:
-                        saved = _load_json(SAVE_BACKUP)
-                        _deep_merge(self.data, saved)
-                        self.data["stats"]["sessions"] += 1
-                        self._session_start = time.time()
-                        return True
-                    except (ValueError, json.JSONDecodeError, OSError, IOError, KeyError, TypeError) as backup_err:
-                        logger.warning("Backup save corrupted: %s", backup_err)
-
+                logger.warning("Save file corrupted, starting fresh: %s", e)
                 self.data = _default_state()
                 return False
         return False
 
     def reset(self) -> None:
         self.data = _default_state()
-        for path in (SAVE_FILE, SAVE_BACKUP):
-            if os.path.exists(path):
-                try:
-                    os.remove(path)
-                except OSError:
-                    logger.warning("Failed to remove save file: %s", path)
+        if os.path.exists(SAVE_FILE):
+            try:
+                os.remove(SAVE_FILE)
+            except OSError:
+                logger.warning("Failed to remove save file: %s", SAVE_FILE)
 
     # ── Progress ─────────────────────────────────────────
 
@@ -174,6 +153,14 @@ class GameState:
     @setup_complete.setter
     def setup_complete(self, value):
         self.data["setup_complete"] = value
+
+    @property
+    def glossary_seen(self):
+        return self.data.get("glossary_seen", False)
+
+    @glossary_seen.setter
+    def glossary_seen(self, value):
+        self.data["glossary_seen"] = value
 
     @property
     def game_complete(self):

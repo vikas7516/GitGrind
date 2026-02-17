@@ -12,8 +12,12 @@ from rich.style import Style
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.live import Live
 from content.models import STAGE_BOSS, STAGE_EXERCISE, STAGE_SETUP
+import sounds
 
 console = Console()
+
+# ── Brand color used for the logo everywhere ──
+LOGO_COLOR = "bold orange1"
 
 
 # ═══════════════════════════════════════════════════════════
@@ -22,6 +26,11 @@ console = Console()
 
 def clear():
     console.clear()
+
+
+def separator():
+    """Print a dim separator line for visual breathing room between sections."""
+    console.print(f"\n  [dim]{'─' * 60}[/dim]\n")
 
 
 def pause():
@@ -81,12 +90,10 @@ LOGO = r"""
 
 def show_logo():
     clear()
-    # Single bright magenta color - clean and simple
-    console.print(f"[bold bright_magenta]{LOGO}[/bold bright_magenta]")
-
-    tagline = Text("Learn Git by doing. No repos needed.", style="italic bright_cyan")
-    console.print("  ", tagline, "\n")
-
+    console.print(f"[{LOGO_COLOR}]{LOGO}[/{LOGO_COLOR}]")
+    tagline = Text("Learn Git by Grinding.", style="italic bright_cyan")
+    console.print("  ", tagline)
+    console.print()
 
 
 def show_main_menu(state, total_stages, next_stage_label=None):
@@ -173,19 +180,13 @@ def show_main_menu(state, total_stages, next_stage_label=None):
     if recent:
         console.print("\n  [bold bright_cyan]✨ Recently Mastered:[/bold bright_cyan]")
         for i, cmd in enumerate(reversed(recent), 1):
-            # Alternate colors for visual interest
             cmd_color = "bright_yellow" if i % 2 == 1 else "bright_magenta"
             console.print(f"    [bright_green]✓[/bright_green] [bold {cmd_color}]{cmd}[/bold {cmd_color}]")
 
-    # Colorful separator
-    console.print(f"\n  [dim]{'─' * 70}[/dim]")
+    separator()
 
-    # Colorful separator
-    console.print(f"\n  [dim]{'─' * 70}[/dim]")
+    console.print("  [bold bright_white]🎮 Actions:[/bold bright_white]\n")
 
-    console.print()
-    console.print("  [bold bright_white]🎮 Actions:[/bold bright_white]")
-    console.print()
     if state.game_complete:
         console.print("  [bold bright_green]  🔄 [C][/bold bright_green] [bright_white]Replay any stage[/bright_white]")
     elif prog > 0:
@@ -201,9 +202,59 @@ def show_main_menu(state, total_stages, next_stage_label=None):
     else:
         console.print(f"  [dim]  📓 [N][/dim] [dim]Notebook (empty — start playing!)[/dim]")
 
+    # Glossary option
+    console.print("  [bold bright_cyan]  📖 [G][/bold bright_cyan] [bright_white]Git Glossary[/bright_white]")
+
     console.print("  [bold bright_red]  🗑️  [X][/bold bright_red] [bright_magenta]Reset all progress[/bright_magenta]")
     console.print("  [dim]  👋 [Q][/dim] [dim]Quit[/dim]")
     console.print()
+
+
+# ═══════════════════════════════════════════════════════════
+#  GIT GLOSSARY
+# ═══════════════════════════════════════════════════════════
+
+def show_glossary():
+    """
+    Display the Git terminology glossary in paginated category panels.
+    Each category is shown as its own panel; user presses Enter to advance.
+    """
+    from content.glossary import GIT_GLOSSARY
+
+    clear()
+    console.print(f"\n  [{LOGO_COLOR}]📖 GIT GLOSSARY[/{LOGO_COLOR}]")
+    console.print("  [italic bright_cyan]Git jargon explained in plain English.[/italic bright_cyan]")
+    console.print(f"  [dim]{len(GIT_GLOSSARY)} categories • Press Enter to advance[/dim]\n")
+
+    for cat_idx, (category_name, terms) in enumerate(GIT_GLOSSARY, 1):
+        content_lines = []
+        for term, explanation in terms:
+            content_lines.append(f"  [bold bright_yellow]{term}[/bold bright_yellow]")
+            content_lines.append(f"    [bright_white]{explanation}[/bright_white]")
+            content_lines.append("")
+
+        body = "\n".join(content_lines).rstrip()
+
+        console.print(Panel(
+            body,
+            title=f"[bold bright_cyan]{category_name}  [dim]({cat_idx}/{len(GIT_GLOSSARY)})[/dim][/bold bright_cyan]",
+            border_style="bright_cyan",
+            width=75,
+            padding=(1, 2),
+        ))
+
+        if cat_idx < len(GIT_GLOSSARY):
+            console.print("  [italic bright_cyan]Press Enter for next category...[/italic bright_cyan]")
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                return
+
+    separator()
+    console.print("  [bold bright_green]✅ That's all the essential Git terminology![/bold bright_green]")
+    console.print("  [dim]You'll learn each of these through hands-on practice in the game.[/dim]")
+    console.print()
+    pause()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -237,8 +288,7 @@ def show_level_map(stages, cleared):
 
         console.print(f"    {marker} {label} {status}")
 
-    console.print(f"\n  [dim]{'─' * 70}[/dim]")
-    console.print()
+    separator()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -288,9 +338,10 @@ def show_teaching(teaching, index, total):
         title=f"[bold bright_cyan]📖 {teaching.command}  [dim]({index}/{total})[/dim][/bold bright_cyan]",
         border_style="bright_cyan",
         width=70,
-        padding=(1, 1),
+        padding=(1, 2),
     ))
     pause()
+    separator()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -316,15 +367,16 @@ def show_exercise_prompt(exercise, index=None, total=None):
     console.print(f"  [bold bright_white]{exercise.prompt}[/bold bright_white]")
 
     if exercise.type == "fill_blank" and exercise.blank_template:
-        console.print(f"  [italic bright_cyan]{exercise.blank_template}[/italic bright_cyan]")
+        console.print(f"\n  [italic bright_cyan]{exercise.blank_template}[/italic bright_cyan]")
 
     if exercise.type == "multi_choice" and exercise.choices:
+        console.print()
         for i, choice in enumerate(exercise.choices, 1):
-            # Alternate colors for choices
             choice_color = "bright_yellow" if i % 2 == 1 else "bright_cyan"
             console.print(f"    [bold {choice_color}]{choice}[/bold {choice_color}]")
 
     if exercise.type == "error_fix" and exercise.error_output:
+        console.print()
         console.print(Panel(
             f"[bright_red]{exercise.error_output}[/bright_red]",
             title="[bold bright_red]❌ Error Output[/bold bright_red]",
@@ -333,6 +385,7 @@ def show_exercise_prompt(exercise, index=None, total=None):
         ))
 
     if exercise.type == "reverse" and exercise.sim_output:
+        console.print()
         console.print(Panel(
             f"[bright_green]{exercise.sim_output}[/bright_green]",
             title="[bold bright_white]💻 Terminal Output[/bold bright_white]",
@@ -340,7 +393,7 @@ def show_exercise_prompt(exercise, index=None, total=None):
             width=70
         ))
 
-    console.print("  [dim italic](type [bright_yellow]'quit'[/bright_yellow] to return to menu)[/dim italic]")
+    console.print("\n  [dim italic](type [bright_yellow]'quit'[/bright_yellow] to return to menu)[/dim italic]")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -348,18 +401,23 @@ def show_exercise_prompt(exercise, index=None, total=None):
 # ═══════════════════════════════════════════════════════════
 
 def show_correct(sim_output=None):
-    console.print("  [bold bright_green]✨ ✅ Correct! Well done![/bold bright_green]")
+    sounds.sound_correct()
+    console.print("\n  [bold bright_green]✨ ✅ Correct! Well done![/bold bright_green]")
     if sim_output:
+        console.print()
         console.print(Panel(sim_output, title="[bright_green]💻 Simulated Output[/bright_green]",
                             border_style="bright_green", width=70))
+    separator()
 
 
 def show_wrong(correct_answer, explanation=None):
     """Legacy wrong-answer display (still used for first wrong attempt in non-retry contexts)."""
-    console.print("  [bold bright_red]❌ Not quite. Try again![/bold bright_red]")
+    sounds.sound_wrong()
+    console.print("\n  [bold bright_red]❌ Not quite. Try again![/bold bright_red]")
     console.print(f"  [italic dim]Correct answer:[/italic dim] [bold bright_yellow]{correct_answer}[/bold bright_yellow]")
     if explanation:
         console.print(f"  [bold bright_cyan]💡 Why:[/bold bright_cyan] [italic cyan]{explanation}[/italic cyan]")
+    separator()
 
 
 def show_wrong_retry(user_answer, near_miss_hint=None):
@@ -368,13 +426,15 @@ def show_wrong_retry(user_answer, near_miss_hint=None):
     Does NOT reveal the correct answer — just shows what the user typed,
     an optional near-miss hint, and encourages them to try again.
     """
-    console.print("  [bold bright_red]❌ Not quite![/bold bright_red]")
+    sounds.sound_wrong()
+    console.print("\n  [bold bright_red]❌ Not quite![/bold bright_red]")
     console.print(f"  [dim]You entered:[/dim] [bold bright_white]{user_answer}[/bold bright_white]")
 
     if near_miss_hint:
         console.print(f"  [bold bright_yellow]💡 {near_miss_hint}[/bold bright_yellow]")
     else:
         console.print("  [italic bright_yellow]↻ Try again![/italic bright_yellow]")
+    console.print()
 
 
 def show_skip_hint():
@@ -390,6 +450,7 @@ def show_skip_result(user_answer, correct_answer, explanation=None):
     Show comparison panel when the user types 'skip'.
     Displays: what you typed vs the correct answer, plus the explanation.
     """
+    sounds.sound_skip()
     comparison = (
         f"  [bold bright_red]Your answer:[/bold bright_red]    [bright_white]{user_answer}[/bright_white]\n"
         f"  [bold bright_green]Correct answer:[/bold bright_green] [bold bright_yellow]{correct_answer}[/bold bright_yellow]"
@@ -398,6 +459,7 @@ def show_skip_result(user_answer, correct_answer, explanation=None):
     if explanation:
         comparison += f"\n\n  [bold bright_cyan]💡 Explanation:[/bold bright_cyan]\n  [italic cyan]{explanation}[/italic cyan]"
 
+    console.print()
     console.print(Panel(
         comparison,
         title="[bold bright_yellow]⏭️  Skipped — Here's the answer[/bold bright_yellow]",
@@ -405,11 +467,13 @@ def show_skip_result(user_answer, correct_answer, explanation=None):
         width=70,
         padding=(1, 1),
     ))
+    separator()
 
 
 def show_hint(hint_text):
-    console.print(f"  [bold bright_yellow]💡 Hint:[/bold bright_yellow] [italic yellow]{hint_text}[/italic yellow]")
-    console.print("  [italic dim]Try again:[/italic dim]")
+    sounds.sound_hint()
+    console.print(f"\n  [bold bright_yellow]💡 Hint:[/bold bright_yellow] [italic yellow]{hint_text}[/italic yellow]")
+    console.print("  [italic dim]Try again:[/italic dim]\n")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -432,6 +496,7 @@ def show_drill_recap(level):
 
     body = "\n".join(content_lines).rstrip()
 
+    console.print()
     console.print(Panel(
         body,
         title="[bold bright_cyan]📋 Quick Recap — Commands You Just Learned[/bold bright_cyan]",
@@ -439,7 +504,7 @@ def show_drill_recap(level):
         width=70,
         padding=(1, 1),
     ))
-    console.print()
+    separator()
 
 
 # ═══════════════════════════════════════════════════════════
@@ -469,6 +534,7 @@ def show_session_summary(state):
 
     body = "\n".join(content_parts)
 
+    console.print()
     console.print(Panel(
         body,
         title="[bold bright_white]📈 Session Summary[/bold bright_white]",
@@ -488,7 +554,7 @@ def show_notebook(state):
     Display all learned commands from the notebook, organized by category.
     Shows command, syntax, explanation, and pro tip for each entry.
     """
-    from cheatsheet import category_map, CATEGORY_ORDER
+    from notebook import category_map, CATEGORY_ORDER
 
     entries = state.notebook_entries
     if not entries:
@@ -523,7 +589,7 @@ def show_notebook(state):
         console.print(f"  [dim]{'─' * 60}[/dim]")
 
         for cmd, data in cmds:
-            console.print(f"    [bold bright_yellow]{cmd}[/bold bright_yellow]")
+            console.print(f"\n    [bold bright_yellow]{cmd}[/bold bright_yellow]")
             if data.get("syntax"):
                 console.print(f"      [dim]Syntax:[/dim] [bright_white]{data['syntax']}[/bright_white]")
             if data.get("explanation"):
@@ -535,10 +601,10 @@ def show_notebook(state):
                     console.print(f"      [dim italic]...({len(explanation_lines) - 2} more lines)[/dim italic]")
             if data.get("pro_tip"):
                 console.print(f"      [italic yellow]💡 {data['pro_tip']}[/italic yellow]")
-            console.print()
 
-    console.print(f"  [dim]{'─' * 60}[/dim]")
-    console.print()
+        console.print()
+
+    separator()
     console.print("  [bold bright_white]Options:[/bold bright_white]")
     console.print("    [bold bright_green][S][/bold bright_green] Save notebook as text file")
     console.print("    [dim][B][/dim] Back to menu")
@@ -552,11 +618,13 @@ def show_notebook(state):
 def show_level_header(level):
     clear()
     title = f"Level {level.number} — {level.name}"
+    console.print()
     console.print(Panel(
         f"[italic bright_cyan]{level.tagline}[/italic bright_cyan]\n\n[bright_white]{level.concept}[/bright_white]",
         title=f"[bold bright_green]🎓 {title}[/bold bright_green]",
         border_style="bright_green",
         width=70,
+        padding=(1, 2),
     ))
     pause()
 
@@ -564,22 +632,28 @@ def show_level_header(level):
 def show_exercise_round_header(er):
     clear()
     required, total = er.pass_threshold
+    console.print()
     console.print(Panel(
-        f"[italic bright_blue]{er.tagline}[/italic bright_blue]\n\nPass: [bold bright_yellow]{required}/{total}[/bold bright_yellow] correct",
+        f"[italic bright_blue]{er.tagline}[/italic bright_blue]\n\n"
+        f"Pass: [bold bright_yellow]{required}/{total}[/bold bright_yellow] correct",
         title=f"[bold bright_blue]💪 Exercise Round {er.number} — {er.name}[/bold bright_blue]",
         border_style="bright_blue",
         width=70,
+        padding=(1, 2),
     ))
     pause()
 
 
 def show_boss_header(boss):
     clear()
+    sounds.sound_boss_intro()
+    console.print()
     console.print(Panel(
         f"[italic bright_red]{boss.tagline}[/italic bright_red]\n\n[bright_white]{boss.story}[/bright_white]",
         title=f"[bold bright_red]⚔️  BOSS FIGHT {boss.number} — {boss.name}[/bold bright_red]",
         border_style="bright_red",
         width=70,
+        padding=(1, 2),
     ))
     console.print("\n  [bold bright_red]⚠️  ALL STEPS MUST BE CORRECT. ⚠️[/bold bright_red]")
     pause()
@@ -587,11 +661,13 @@ def show_boss_header(boss):
 
 def show_setup_intro():
     clear()
+    console.print()
     console.print(Panel(
         "[italic bright_yellow]Before we begin, let's make sure Git is configured.[/italic bright_yellow]",
         title="[bold bright_yellow]⚙️  Setup[/bold bright_yellow]",
         border_style="bright_yellow",
         width=70,
+        padding=(1, 2),
     ))
 
 
@@ -600,13 +676,14 @@ def show_setup_intro():
 # ═══════════════════════════════════════════════════════════
 
 def show_drill_header(required, total):
-    console.print(f"\n  [bold bright_white on bright_red] 🎯 DRILL ZONE [/bold bright_white on bright_red]")
+    separator()
+    console.print(f"  [bold bright_white on bright_red] 🎯 DRILL ZONE [/bold bright_white on bright_red]")
     console.print(f"  [italic cyan]Get [bold bright_yellow]{required}/{total}[/bold bright_yellow] correct to pass this level.[/italic cyan]\n")
 
 
 def show_drill_progress(correct, wrong, required, total):
     remaining = total - correct - wrong
-    console.print(f"  [bright_green]✅ {correct}[/bright_green]  [bright_red]❌ {wrong}[/bright_red]  "
+    console.print(f"\n  [bright_green]✅ {correct}[/bright_green]  [bright_red]❌ {wrong}[/bright_red]  "
                   f"[dim]Remaining: [bright_white]{remaining}[/bright_white]  |  Need: [bright_yellow]{required}[/bright_yellow][/dim]")
 
 
@@ -615,32 +692,39 @@ def show_drill_progress(correct, wrong, required, total):
 # ═══════════════════════════════════════════════════════════
 
 def show_stage_cleared(stage_label, msg=None):
+    sounds.sound_stage_cleared()
     content = f"[bold bright_green]🎉 ✨ CLEARED: {stage_label} ✨ 🎉[/bold bright_green]"
     if msg:
         content += f"\n\n[bright_white]{msg}[/bright_white]"
-    console.print(Panel(content, border_style="bright_green", width=70))
+    separator()
+    console.print(Panel(content, border_style="bright_green", width=70, padding=(1, 2)))
     pause()
 
 
 def show_stage_failed(stage_label, msg=None):
+    sounds.sound_stage_failed()
     content = f"[bold bright_red]💀 FAILED: {stage_label}[/bold bright_red]"
     if msg:
         content += f"\n\n[bright_yellow]{msg}[/bright_yellow]"
-    console.print(Panel(content, border_style="bright_red", width=70))
+    separator()
+    console.print(Panel(content, border_style="bright_red", width=70, padding=(1, 2)))
 
 
 def show_boss_failed_mercy(stage_label, attempt_count, max_attempts):
     """Show boss failure with mercy option after too many attempts."""
+    sounds.sound_stage_failed()
     content = (
         f"[bold bright_red]💀 FAILED: {stage_label}[/bold bright_red]\n\n"
         f"[bright_white]Attempt [bold]{attempt_count}/{max_attempts}[/bold].[/bright_white]\n"
     )
     if attempt_count >= max_attempts:
-        content += "[bright_yellow]💡 You can type 'skip' to move past this boss fight.[/bright_yellow]"
-    console.print(Panel(content, border_style="bright_red", width=70))
+        content += "\n[bright_yellow]💡 You can type 'skip' to move past this boss fight.[/bright_yellow]"
+    separator()
+    console.print(Panel(content, border_style="bright_red", width=70, padding=(1, 2)))
 
 
 def show_game_complete(state):
+    sounds.sound_game_complete()
     clear()
     mastery = int(round(state.accuracy * 0.7 + state.first_try_accuracy * 0.3))
     if mastery >= 90:
@@ -656,22 +740,24 @@ def show_game_complete(state):
         rank = "🌟 GitGrind Graduate"
         rank_color = "bright_blue"
 
+    console.print()
     console.print(Panel(
         f"[bold bright_green]🏆 ✨ CONGRATULATIONS! ✨ 🏆[/bold bright_green]\n\n"
         f"[bright_white]You completed GitGrind![/bright_white]\n\n"
         f"[bold bright_cyan]Final Rank:[/bold bright_cyan] [{rank_color}]{rank}[/{rank_color}]\n"
         f"[bold bright_cyan]Mastery Score:[/bold bright_cyan] [bold bright_yellow]{mastery}%[/bold bright_yellow]\n\n"
-        f"[bold bright_magenta]📊 Final Stats[/bold bright_magenta]\n"
+        f"[bold bright_magenta]📊 Final Stats[/bold bright_magenta]\n\n"
         f"  [bright_cyan]Accuracy:[/bright_cyan]           [bright_green]{state.accuracy}%[/bright_green]\n"
         f"  [bright_cyan]First-try:[/bright_cyan]          [bright_green]{state.first_try_accuracy}%[/bright_green]\n"
         f"  [bright_cyan]Best streak:[/bright_cyan]        [bright_red]🔥 {state.best_streak}[/bright_red]\n"
         f"  [bright_cyan]Commands typed:[/bright_cyan]     [bright_yellow]{state.total_commands_typed}[/bright_yellow]\n"
         f"  [bright_cyan]Commands learned:[/bright_cyan]   [bright_magenta]{len(state.data['commands_learned'])}[/bright_magenta]\n"
         f"  [bright_cyan]Time played:[/bright_cyan]        [bright_green]{state.time_played_display}[/bright_green]\n\n"
-        f"[bold bright_white]✅ Your cheat sheet + mastery report have been saved![/bold bright_white]",
+        f"[bold bright_white]📓 Check your Notebook [N] for a full reference of everything you learned![/bold bright_white]",
         title="[bold bright_yellow]🎓 ✨ GAME COMPLETE ✨ 🎓[/bold bright_yellow]",
         border_style="bright_yellow",
         width=70,
+        padding=(1, 2),
     ))
     # No pause() here — main.py handles the post-game flow
 
@@ -684,8 +770,8 @@ def show_welcome_animation():
     """Show a colorful welcome animation for first-time players."""
     clear()
 
-    # Simple single-color logo
-    console.print(f"[bold bright_magenta]{LOGO}[/bold bright_magenta]")
+    # Red-orange branded logo
+    console.print(f"[{LOGO_COLOR}]{LOGO}[/{LOGO_COLOR}]")
     console.print()
 
     # Animated welcome message
@@ -700,25 +786,27 @@ def show_welcome_animation():
         console.print(f"  {color}{msg}[/{color[1:-1]}]")
         time.sleep(0.3)
 
-    console.print(f"\n  [dim]{'─' * 70}[/dim]")
-    console.print(f"\n  [bold bright_white]✨ Let's begin your Git journey! ✨[/bold bright_white]\n")
+    separator()
+    console.print(f"  [bold bright_white]✨ Let's begin your Git journey! ✨[/bold bright_white]\n")
     pause()
 
 
 def show_stage_transition(from_stage=None, to_stage=None):
     """Show a colorful transition between stages."""
     if to_stage:
-        console.print(f"\n  [dim]{'═' * 70}[/dim]")
+        separator()
         console.print(f"  [bold bright_yellow]⏭️  Loading:[/bold bright_yellow] [bright_cyan]{to_stage}[/bright_cyan]")
-        console.print(f"  [dim]{'═' * 70}[/dim]\n")
+        separator()
         time.sleep(0.3)
 
 
 def show_streak(streak_count):
     """Show streak notification."""
     if streak_count >= 10:
-        console.print(f"  [bold bright_red]🔥🔥🔥 {streak_count} STREAK! UNSTOPPABLE! 🔥🔥🔥[/bold bright_red]")
+        sounds.sound_streak()
+        console.print(f"\n  [bold bright_red]🔥🔥🔥 {streak_count} STREAK! UNSTOPPABLE! 🔥🔥🔥[/bold bright_red]\n")
     elif streak_count >= 5:
-        console.print(f"  [bold orange1]🔥🔥 {streak_count} streak! Keep it up! 🔥🔥[/bold orange1]")
+        sounds.sound_streak()
+        console.print(f"\n  [bold orange1]🔥🔥 {streak_count} streak! Keep it up! 🔥🔥[/bold orange1]\n")
     elif streak_count >= 3:
-        console.print(f"  [bold yellow]🔥 {streak_count} streak! Nice![/bold yellow]")
+        console.print(f"\n  [bold yellow]🔥 {streak_count} streak! Nice![/bold yellow]\n")

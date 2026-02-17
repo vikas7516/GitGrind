@@ -19,7 +19,8 @@ def main():
     try:
         import main
         import ui
-        import cheatsheet
+        import notebook
+        import sounds
         from engine import runner, state, validator
         from content import models, stage_map
         from content.levels_basics import BASICS_LEVELS
@@ -142,4 +143,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

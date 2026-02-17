@@ -15,7 +15,6 @@ from content.levels_remote import REMOTE_LEVELS
 from content.levels_adv import ADVANCED_LEVELS
 from content.exercises import ALL_EXERCISE_ROUNDS
 from content.bossfights import ALL_BOSS_FIGHTS
-from cheatsheet import generate_cheatsheet
 from notebook import generate_notebook_txt
 
 
@@ -195,9 +194,6 @@ def play_continue(state):
         state.save()
         ui.show_game_complete(state)
         ui.pause()
-        generate_cheatsheet(state)
-        ui.console.print("\n  [bold bright_green]🎁 Rewards saved:[/bold bright_green] [bright_cyan]git_cheatsheet.txt[/bright_cyan] [dim]+[/dim] [bright_magenta]git_mastery_report.txt[/bright_magenta]")
-        ui.pause()
 
     ui.show_session_summary(state)
 
@@ -266,6 +262,11 @@ def play_notebook(state):
         ui.pause()
 
 
+def play_glossary():
+    """View the Git terminology glossary."""
+    ui.show_glossary()
+
+
 def play_reset(state):
     """Reset all progress."""
     ui.console.print("\n  [bold bright_red]⚠️  WARNING: This will DELETE all progress![/bold bright_red]")
@@ -293,6 +294,13 @@ def main():
         ui.console.print("[italic bright_cyan]Starting with fresh save...[/italic bright_cyan]")
         state = GameState()
 
+    # ── First-launch glossary ────────────────────────────
+    if not state.glossary_seen:
+        ui.show_welcome_animation()
+        ui.show_glossary()
+        state.glossary_seen = True
+        state.save()
+
     try:
         while True:
             next_stage_label = None
@@ -307,6 +315,8 @@ def main():
                 play_replay(state)
             elif choice in ("n", "notebook"):
                 play_notebook(state)
+            elif choice in ("g", "glossary"):
+                play_glossary()
             elif choice in ("x", "reset"):
                 play_reset(state)
             elif choice in ("q", "quit", "exit"):
