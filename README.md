@@ -10,7 +10,7 @@
 
 **Learn Git by doing. No repos needed. No frustration. Just results.**
 
-[Quick Start](QUICKSTART.md) • [Features](#-features) • [Installation](#-installation) • [How to Play](#-how-to-play) • [Contributing](#-contributing)
+[Quick Start](QUICKSTART.md) • [Build From Scratch](Rebuild%20This%20Project/full%20version/introduction.md) • [Features](#-features) • [Installation](#-installation) • [How to Play](#-how-to-play) • [Contributing](#-contributing)
 
 ---
 
@@ -26,6 +26,12 @@ Most Git tutorials teach you to **memorize commands**. GitGrind teaches you to *
 - ✅ **No Setup Required** — Practice without creating repositories
 - ✅ **Track Progress** — Save your journey and earn rewards
 - ✅ **400+ Exercises** — Each with detailed explanations
+
+## 🏗️ Want to build this?
+> **This entire project is a tutorial.**
+> You can rebuild GitGrind from scratch — line by line — to master Python architecture.
+>
+> 👉 **[Start the "Rebuild This Project" Guide](Rebuild%20This%20Project/full%20version/introduction.md)**
 
 ## ✨ Features
 

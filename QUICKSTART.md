@@ -9,6 +9,9 @@ pip install -r requirements.txt
 python main.py
 ```
 
+> **Prefer to build it yourself?**
+> Skip the download. Follow the **[Rebuild This Project](Rebuild%20This%20Project/full%20version/introduction.md)** guide to write your own GitGrind from scratch.
+
 ## First Time Playing?
 
 1. **Read the Git Glossary** — shown automatically on first launch (22 key terms explained simply)
